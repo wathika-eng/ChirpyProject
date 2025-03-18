@@ -32,7 +32,7 @@ func main() {
 	log.Printf("server running on http://localhost%v\n", server.Addr)
 	err := server.ListenAndServe()
 	if err != nil {
-		log.Fatal("error running server")
+		log.Fatalf("error running server: %v", err.Error())
 	}
 }
 

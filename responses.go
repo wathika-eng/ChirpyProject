@@ -3,9 +3,16 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 )
+
+var badWords = map[int]string{
+	1: "kerfuffle",
+	2: "sharbert",
+	3: "fornax",
+}
 
 func Health(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
@@ -41,11 +48,27 @@ func ValidateChirp(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	bodyStruct := BodyStruct{}
 	err := decoder.Decode(&bodyStruct)
-	if err != nil {
+	log.Println(bodyStruct)
+	if err != nil || len(bodyStruct.Body) <= 0 {
+		w.WriteHeader(400)
 		w.Write([]byte("error:"))
 		w.Write([]byte("something went wrong"))
 		return
 	}
+	if len(bodyStruct.Body) > 140 {
+		w.WriteHeader(400)
+		w.Write([]byte("error:"))
+		w.Write([]byte("too long"))
+		return
+	}
+	// for k, v := range badWords {
+	// 	contains, err := regexp.MatchString(v, bodyStruct.Body)
+	// 	if contains {
+	// 		for i, x := range bodyStruct.Body {
+	// 			bodyStruct.Body[i] = "*"
+	// 		}
+	// 	}
+	// }
 	w.Write([]byte("valid:"))
 	w.Write([]byte("true"))
 }
